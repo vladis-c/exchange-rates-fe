@@ -10,20 +10,27 @@ type CurrencyCode = Currency['code'];
 const currencies = ref<CurrencyCode[]>([]);
 const selectedFrom = ref<CurrencyCode>('');
 const selectedTo = ref<CurrencyCode>('');
-const amount = ref<number | null>(null);
+const amount = ref<string | null>(null);
 const conversion = ref<ConversionRate | null>(null);
+const error = ref<string | null>(null);
 
 const setAmount = (event: Event) => {
   const target = event.target as HTMLSelectElement;
-  amount.value = +target.value;
+  amount.value = target.value;
 };
 
 const convert = async () => {
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
+    if (+amount.value === 0) {
+      error.value = 'Invalid input: Please enter a valid number.';
+      return;
+    } else {
+      error.value = null;
+    }
     const data = await getSingleCoversion(
       selectedFrom.value,
       selectedTo.value,
-      amount.value,
+      +amount.value,
     );
     conversion.value = data;
   }
@@ -57,6 +64,7 @@ onMounted(async () => {
             placeholder="Amount"
             @change="setAmount"
             v-model="amount" />
+          <p v-if="error !== null">{{ error }}</p>
         </div>
         <!-- Select: currency to convert From -->
         <Select
