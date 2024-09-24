@@ -13,16 +13,9 @@ const selectedTo = ref<CurrencyCode>('');
 const amount = ref<number | null>(null);
 const conversion = ref<ConversionRate | null>(null);
 
-const selectFrom = (e: any) => {
-  selectedFrom.value = e.target.value;
-};
-
-const selectTo = (e: any) => {
-  selectedTo.value = e.target.value;
-};
-
-const setAmount = (e: any) => {
-  amount.value = +e.target.value;
+const setAmount = (event: Event) => {
+  const target = event.target as HTMLSelectElement;
+  amount.value = +target.value;
 };
 
 const convert = async () => {
@@ -84,7 +77,20 @@ onMounted(async () => {
           Convert
         </button>
         <!-- Display: Conversion rate -->
-        <p v-if="conversion !== null">{{ conversion.quote_amount }}</p>
+        <div v-if="conversion !== null" class="flex flex-col">
+          <p>
+            {{ `${conversion.base_amount.toFixed(2)} ${selectedFrom} =` }}
+          </p>
+          <p>{{ `${conversion.quote_amount.toFixed(2)} ${selectedTo}` }}</p>
+          <p>
+            {{ `1 ${selectedFrom} = ${conversion.quote} ${selectedTo}` }}
+          </p>
+          <p>
+            {{
+              `1 ${selectedTo} = ${conversion.opposite_quote} ${selectedFrom}`
+            }}
+          </p>
+        </div>
       </div>
     </div>
 

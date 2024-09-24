@@ -15,6 +15,7 @@ export type Rate = {
 };
 
 export type ConversionRate = Rate & {
+  opposite_quote: number;
   base_amount: number;
   quote_amount: number;
 };
