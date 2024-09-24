@@ -1,60 +1,134 @@
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import type {Currency} from './types';
+import {type ConversionRate, type Currency} from './types';
+import {getAllCurrencies} from './api/currencies';
+import {getSingleCoversion} from './api/coversions';
 
-const name = ref('Vlad');
-const currencies = ref<Currency['code'][]>([]);
-const selectedCurrency = ref('');
+type CurrencyCode = Currency['code'];
 
-const convertCurrency = () => {
-  if (selectedCurrency.value.trim() !== '') {
-    const alreadyExists =
-      currencies.value.indexOf(selectedCurrency.value) !== -1;
-    if (!alreadyExists) {
-      currencies.value.push(selectedCurrency.value);
-    }
-    selectedCurrency.value = '';
-  }
+const currencies = ref<CurrencyCode[]>([]);
+const selectedFrom = ref<CurrencyCode>('');
+const selectedTo = ref<CurrencyCode>('');
+const amount = ref<number | null>(null);
+const conversion = ref<ConversionRate | null>(null);
+
+const selectFrom = (e: any) => {
+  selectedFrom.value = e.target.value;
 };
 
-const deleteCurrency = (i: number) => {
-  const exists = currencies.value[i] !== undefined;
-  if (exists) {
-    currencies.value.splice(i, 1);
+const selectTo = (e: any) => {
+  selectedTo.value = e.target.value;
+};
+
+const setAmount = (e: any) => {
+  amount.value = +e.target.value;
+};
+
+const convert = async () => {
+  if (selectedFrom.value && selectedTo.value && amount.value !== null) {
+    const data = await getSingleCoversion(
+      selectedFrom.value,
+      selectedTo.value,
+      amount.value,
+    );
+    conversion.value = data;
   }
 };
 
 onMounted(async () => {
-  try {
-    const res = await fetch('http://localhost:8000/currencies');
-    const data: Currency[] = await res.json();
-    currencies.value = data.map(el => el.code);
-  } catch (error) {
-    console.log('Fetching error', error);
+  const data = await getAllCurrencies();
+  if (!data) {
+    return;
   }
+  currencies.value = data.map(el => el.code);
+  selectedFrom.value = 'EUR'; // setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions
 });
 </script>
 
 <template>
-  <h1>Exchange rates {{ name }}</h1>
-  <form @submit.prevent="convertCurrency">
-    <label for="convertCurrency">Convert currency</label>
-    <input
-      type="text"
-      name="convertCurrency"
-      id="convertCurrency"
-      v-model="selectedCurrency" />
-    <button type="submit">Select</button>
-  </form>
-  <h3>Currencies:</h3>
-  <ul>
-    <li v-for="(currency, index) in currencies" :key="currency">
-      <span>
-        {{ currency }}
-        <button @click="() => deleteCurrency(index)">X</button>
-      </span>
-    </li>
-  </ul>
+  <div class="min-h-screen flex flex-col items-center bg-gray-50 p-24 gap-8">
+    <!-- Converter -->
+    <div class="w-full max-w-1280 p-8 bg-white shadow-md rounded-lg">
+      <h1 class="text-xl font-semibold text-gray-800 text-center mb-4">
+        Currency Converter
+      </h1>
+      <div class="flex flex-col space-y-4">
+        <!-- Input: Amount -->
+        <div class="flex flex-col">
+          <label for="amount" class="text-sm text-gray-600 mb-1">Amount</label>
+          <input
+            id="amount"
+            type="number"
+            class="p-4 border h-16 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Amount"
+            @change="setAmount"
+            v-model="amount" />
+        </div>
+
+        <!-- Select: Convert From -->
+        <div class="flex flex-col">
+          <label for="from-currency" class="text-sm text-gray-600 mb-1"
+            >From</label
+          >
+          <!-- setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions -->
+          <select
+            disabled="true"
+            id="from-currency"
+            v-model="selectedFrom"
+            @change="selectFrom"
+            class="p-4 h-16 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+            <option
+              v-for="(currency, index) in currencies"
+              :key="index"
+              :value="currency">
+              {{ currency }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Select: Convert To -->
+        <div class="flex flex-col">
+          <label for="to-currency" class="text-sm text-gray-600 mb-1">To</label>
+          <select
+            id="to-currency"
+            v-model="selectedTo"
+            @change="selectTo"
+            class="p-4 h-16 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+            <option value="">-----</option>
+            <option
+              v-for="(currency, index) in currencies"
+              :key="index"
+              :value="currency">
+              {{ currency }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Button: Convert -->
+        <button
+          class="p-4 h-16 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-200"
+          @click="convert">
+          Convert
+        </button>
+
+        <!-- Display: Conversion rate -->
+        <p v-if="conversion !== null">{{ conversion.quote_amount }}</p>
+      </div>
+    </div>
+
+    <!-- Section: Exchange Rates List -->
+    <!-- <div class="w-full max-w-1280 p-6 bg-white shadow-md rounded-lg">
+      <h2 class="text-lg font-semibold text-gray-800 text-center mb-4">
+        Exchange Rates
+      </h2>
+      <div class="flex flex-col space-y-2">
+        <div class="flex justify-between p-2 bg-gray-100 rounded-md">
+          <span class="text-gray-700">Currency Name (Code)</span>
+          <span class="text-gray-700">Rate</span>
+        </div>
+      </div>
+    </div> -->
+  </div>
 </template>
 
 <style></style>
