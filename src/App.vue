@@ -3,6 +3,7 @@ import {onMounted, ref} from 'vue';
 import {type ConversionRate, type Currency} from './types';
 import {getAllCurrencies} from './api/currencies';
 import {getSingleCoversion} from './api/coversions';
+import Select from './components/SelectComponent.vue';
 
 type CurrencyCode = Currency['code'];
 
@@ -64,53 +65,24 @@ onMounted(async () => {
             @change="setAmount"
             v-model="amount" />
         </div>
-
-        <!-- Select: Convert From -->
-        <div class="flex flex-col">
-          <label for="from-currency" class="text-sm text-gray-600 mb-1"
-            >From</label
-          >
-          <!-- setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions -->
-          <select
-            disabled="true"
-            id="from-currency"
-            v-model="selectedFrom"
-            @change="selectFrom"
-            class="p-4 h-16 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
-            <option
-              v-for="(currency, index) in currencies"
-              :key="index"
-              :value="currency">
-              {{ currency }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Select: Convert To -->
-        <div class="flex flex-col">
-          <label for="to-currency" class="text-sm text-gray-600 mb-1">To</label>
-          <select
-            id="to-currency"
-            v-model="selectedTo"
-            @change="selectTo"
-            class="p-4 h-16 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
-            <option value="">-----</option>
-            <option
-              v-for="(currency, index) in currencies"
-              :key="index"
-              :value="currency">
-              {{ currency }}
-            </option>
-          </select>
-        </div>
-
+        <!-- Select: currency to convert From -->
+        <Select
+          label="From"
+          :currencies="currencies"
+          v-model="selectedFrom"
+          :disabled="true" />
+        <!-- Select: currency to convert To -->
+        <Select
+          label="To"
+          :currencies="currencies"
+          v-model="selectedTo"
+          :disabled="false" />
         <!-- Button: Convert -->
         <button
           class="p-4 h-16 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-200"
           @click="convert">
           Convert
         </button>
-
         <!-- Display: Conversion rate -->
         <p v-if="conversion !== null">{{ conversion.quote_amount }}</p>
       </div>
