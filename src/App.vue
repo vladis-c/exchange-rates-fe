@@ -18,7 +18,8 @@ const amount = ref<string | null>(null);
 const conversion = ref<ConversionRate | null>(null);
 const error = ref<string | null>(null);
 const triggerFetch = ref<boolean>(false);
-const loading = ref<boolean>(false);
+const loadingConversion = ref<boolean>(false);
+const loadingCurrencies = ref<boolean>(false);
 
 const route = useRoute();
 const router = useRouter();
@@ -62,7 +63,7 @@ watch([amount, selectedFrom, selectedTo], () => {
 });
 
 const convert = async () => {
-  loading.value = true;
+  loadingConversion.value = true;
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
     if (+amount.value === 0) {
       error.value = 'Invalid input: Please enter a valid number.';
@@ -77,17 +78,19 @@ const convert = async () => {
     );
     conversion.value = data;
   }
-  loading.value = false;
+  loadingConversion.value = false;
 };
 
 onMounted(async () => {
-  loading.value = true;
+  loadingCurrencies.value = true;
   const data = await getAllCurrencies();
   if (!data) {
-    loading.value = false;
+    loadingCurrencies.value = false;
     return;
   }
   currencies.value = data.map(el => el.code);
+  loadingCurrencies.value = false;
+
   if (route.query.amount) {
     amount.value = route.query.amount.toString();
   }
@@ -114,7 +117,7 @@ onMounted(async () => {
         <div class="flex flex-col">
           <label for="amount" class="text-sm text-gray-600 mb-1">Amount</label>
           <input
-            :disabled="loading"
+            :disabled="loadingConversion"
             id="amount"
             type="number"
             class="p-4 border h-16 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -128,13 +131,15 @@ onMounted(async () => {
           label="From"
           :currencies="currencies"
           v-model="selectedFrom"
-          :disabled="loading" />
+          :disabled="loadingConversion"
+          :loading="loadingCurrencies" />
         <!-- Select: currency to convert To -->
         <Select
           label="To"
           :currencies="currencies"
           v-model="selectedTo"
-          :disabled="loading" />
+          :disabled="loadingConversion"
+          :loading="loadingCurrencies" />
         <!-- Button: Convert -->
         <button
           class="flex flex-row justify-center items-center p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
@@ -144,8 +149,8 @@ onMounted(async () => {
               convert();
             }
           ">
-          <p v-if="!loading">Convert</p>
-          <LoadingSpinner :loading="loading" />
+          <p v-if="!loadingConversion">Convert</p>
+          <LoadingSpinner :loading="loadingConversion" />
         </button>
         <!-- Display: Conversion rate -->
         <div v-if="conversion !== null">
