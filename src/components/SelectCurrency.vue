@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import type {Currency} from '@/types';
 import {defineProps, defineEmits} from 'vue';
 
 type SelectProps = {
-  currencies: any[];
+  currencies: Currency['name'][];
   label: string;
   modelValue: string;
   disabled: boolean;
