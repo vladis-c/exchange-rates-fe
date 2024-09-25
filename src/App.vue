@@ -5,6 +5,7 @@ import {getAllCurrencies} from './api/currencies';
 import {getSingleCoversion} from './api/coversions';
 import Select from './components/SelectCurrency.vue';
 import RateText from './components/RateText.vue';
+import ExchangeRatesList from './components/ExchangeRatesList.vue';
 
 type CurrencyCode = Currency['code'];
 
@@ -14,6 +15,7 @@ const selectedTo = ref<CurrencyCode>('');
 const amount = ref<string | null>(null);
 const conversion = ref<ConversionRate | null>(null);
 const error = ref<string | null>(null);
+const triggerFetch = ref<boolean>(false);
 
 const setAmount = (event: Event) => {
   const target = event.target as HTMLSelectElement;
@@ -82,7 +84,12 @@ onMounted(async () => {
         <!-- Button: Convert -->
         <button
           class="p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
-          @click="convert">
+          @click="
+            () => {
+              triggerFetch = !triggerFetch;
+              convert();
+            }
+          ">
           Convert
         </button>
         <!-- Display: Conversion rate -->
@@ -94,17 +101,10 @@ onMounted(async () => {
     </div>
 
     <!-- Section: Exchange Rates List -->
-    <!-- <div class="w-full max-w-1280 p-6 bg-white shadow-md rounded-lg">
-      <h2 class="text-lg font-semibold text-gray-800 text-center mb-4">
-        Exchange Rates
-      </h2>
-      <div class="flex flex-col space-y-2">
-        <div class="flex justify-between p-2 bg-gray-100 rounded-md">
-          <span class="text-gray-700">Currency Name (Code)</span>
-          <span class="text-gray-700">Rate</span>
-        </div>
-      </div>
-    </div> -->
+    <ExchangeRatesList
+      :currency="selectedFrom"
+      :currencies="currencies"
+      :triggerFetch="triggerFetch" />
   </div>
 </template>
 
