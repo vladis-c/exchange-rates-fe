@@ -6,7 +6,6 @@ type SelectProps = {
   currencies: Currency['code'][];
   label: string;
   modelValue: string;
-  disabled: boolean;
 };
 
 defineProps<SelectProps>();
@@ -23,7 +22,6 @@ const onChange = (event: Event) => {
   <div class="flex flex-col" v-if="modelValue !== undefined">
     <label :for="label" class="text-sm text-gray-600 mb-1">{{ label }}</label>
     <select
-      :disabled="disabled"
       :id="label"
       :value="modelValue"
       @change="onChange"

@@ -82,7 +82,7 @@ onMounted(async () => {
     return;
   }
   currencies.value = data.map(el => el.code);
-  selectedFrom.value = 'EUR'; // setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions
+  // selectedFrom.value = 'EUR'; // setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions
   if (route.query.amount) {
     amount.value = route.query.amount.toString();
   }
@@ -118,17 +118,9 @@ onMounted(async () => {
           <p v-if="error !== null">{{ error }}</p>
         </div>
         <!-- Select: currency to convert From -->
-        <Select
-          label="From"
-          :currencies="currencies"
-          v-model="selectedFrom"
-          :disabled="true" />
+        <Select label="From" :currencies="currencies" v-model="selectedFrom" />
         <!-- Select: currency to convert To -->
-        <Select
-          label="To"
-          :currencies="currencies"
-          v-model="selectedTo"
-          :disabled="false" />
+        <Select label="To" :currencies="currencies" v-model="selectedTo" />
         <!-- Button: Convert -->
         <button
           class="p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
