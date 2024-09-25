@@ -82,7 +82,6 @@ onMounted(async () => {
     return;
   }
   currencies.value = data.map(el => el.code);
-  // selectedFrom.value = 'EUR'; // setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions
   if (route.query.amount) {
     amount.value = route.query.amount.toString();
   }
@@ -133,16 +132,16 @@ onMounted(async () => {
           Convert
         </button>
         <!-- Display: Conversion rate -->
-        <RateText
-          :conversion="conversion"
-          :selected-from="selectedFrom"
-          :selected-to="selectedTo" />
+        <div v-if="conversion !== null">
+          <RateText :conversion="conversion" />
+        </div>
       </div>
     </div>
 
     <!-- Section: Exchange Rates List -->
     <ExchangeRatesList
-      :currency="selectedFrom"
+      :selected-from="selectedFrom"
+      :selected-to="selectedTo"
       :currencies="currencies"
       :triggerFetch="triggerFetch" />
   </div>
