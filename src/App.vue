@@ -4,6 +4,7 @@ import {type ConversionRate, type Currency} from './types';
 import {getAllCurrencies} from './api/currencies';
 import {getSingleCoversion} from './api/coversions';
 import Select from './components/SelectCurrency.vue';
+import RateText from './components/RateText.vue';
 
 type CurrencyCode = Currency['code'];
 
@@ -80,25 +81,15 @@ onMounted(async () => {
           :disabled="false" />
         <!-- Button: Convert -->
         <button
-          class="p-4 h-16 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-200"
+          class="p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
           @click="convert">
           Convert
         </button>
         <!-- Display: Conversion rate -->
-        <div v-if="conversion !== null" class="flex flex-col">
-          <p>
-            {{ `${conversion.base_amount.toFixed(2)} ${selectedFrom} =` }}
-          </p>
-          <p>{{ `${conversion.quote_amount.toFixed(2)} ${selectedTo}` }}</p>
-          <p>
-            {{ `1 ${selectedFrom} = ${conversion.quote} ${selectedTo}` }}
-          </p>
-          <p>
-            {{
-              `1 ${selectedTo} = ${conversion.opposite_quote} ${selectedFrom}`
-            }}
-          </p>
-        </div>
+        <RateText
+          :conversion="conversion"
+          :selected-from="selectedFrom"
+          :selected-to="selectedTo" />
       </div>
     </div>
 

@@ -3,7 +3,7 @@ import type {Currency} from '@/types';
 import {defineProps, defineEmits} from 'vue';
 
 type SelectProps = {
-  currencies: Currency['name'][];
+  currencies: Currency['code'][];
   label: string;
   modelValue: string;
   disabled: boolean;
