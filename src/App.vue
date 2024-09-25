@@ -8,6 +8,7 @@ import Select from './components/SelectCurrency.vue';
 import RateText from './components/RateText.vue';
 import ExchangeRatesList from './components/ExchangeRatesList.vue';
 import LoadingSpinner from './components/LoadingSpinner.vue';
+import ErrorText from './components/ErrorText.vue';
 
 type CurrencyCode = Currency['code'];
 
@@ -16,10 +17,12 @@ const selectedFrom = ref<CurrencyCode>('');
 const selectedTo = ref<CurrencyCode>('');
 const amount = ref<string | null>(null);
 const conversion = ref<ConversionRate | null>(null);
-const error = ref<string | null>(null);
+const inputError = ref<string | null>(null);
 const triggerFetch = ref<boolean>(false);
 const loadingConversion = ref<boolean>(false);
 const loadingCurrencies = ref<boolean>(false);
+const errorConversion = ref<string>('');
+const errorCurrencies = ref<string>('');
 
 const route = useRoute();
 const router = useRouter();
@@ -64,18 +67,22 @@ watch([amount, selectedFrom, selectedTo], () => {
 
 const convert = async () => {
   loadingConversion.value = true;
+  errorConversion.value = '';
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
     if (+amount.value === 0) {
-      error.value = 'Invalid input: Please enter a valid number.';
+      inputError.value = 'Invalid input: Please enter a valid number.';
       return;
     } else {
-      error.value = null;
+      inputError.value = null;
     }
     const data = await getSingleCoversion(
       selectedFrom.value,
       selectedTo.value,
       +amount.value,
     );
+    if (data === null) {
+      errorConversion.value = 'Error when getting the conversion rate';
+    }
     conversion.value = data;
   }
   loadingConversion.value = false;
@@ -86,6 +93,7 @@ onMounted(async () => {
   const data = await getAllCurrencies();
   if (!data) {
     loadingCurrencies.value = false;
+    errorCurrencies.value = 'Error when fetching the list of currencies';
     return;
   }
   currencies.value = data.map(el => el.code);
@@ -106,6 +114,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <ErrorText :text="errorCurrencies || errorConversion" />
   <div class="min-h-screen flex flex-col items-center bg-gray-50 p-24 gap-8">
     <!-- Converter -->
     <div class="w-full max-w-1280 p-8 bg-white shadow-md rounded-lg">
@@ -117,32 +126,35 @@ onMounted(async () => {
         <div class="flex flex-col">
           <label for="amount" class="text-sm text-gray-600 mb-1">Amount</label>
           <input
-            :disabled="loadingConversion || loadingCurrencies"
+            :disabled="
+              loadingConversion || loadingCurrencies || currencies.length === 0
+            "
             id="amount"
             type="number"
             class="p-4 border h-16 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="Amount"
             @change="setAmount"
             v-model="amount" />
-          <p v-if="error !== null">{{ error }}</p>
+          <p v-if="inputError !== null">{{ inputError }}</p>
         </div>
         <!-- Select: currency to convert From -->
         <Select
           label="From"
           :currencies="currencies"
           v-model="selectedFrom"
-          :disabled="loadingConversion"
+          :disabled="loadingConversion || currencies.length === 0"
           :loading="loadingCurrencies" />
         <!-- Select: currency to convert To -->
         <Select
           label="To"
           :currencies="currencies"
           v-model="selectedTo"
-          :disabled="loadingConversion"
+          :disabled="loadingConversion || currencies.length === 0"
           :loading="loadingCurrencies" />
         <!-- Button: Convert -->
         <button
-          class="flex flex-row justify-center items-center p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
+          :disabled="currencies.length === 0"
+          class="flex flex-row justify-center items-center p-4 h-16 bg-orange-900 text-white rounded-md disabled:bg-gray-200 hover:bg-orange-700 transition duration-200"
           @click="
             () => {
               triggerFetch = !triggerFetch;

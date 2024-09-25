@@ -3,6 +3,7 @@ import {defineProps, ref, watch} from 'vue';
 import type {Currency, Rate} from '@/types';
 import {getExchangeRate} from '@/api/rates';
 import LoadingSpinner from './LoadingSpinner.vue';
+import ErrorText from './ErrorText.vue';
 
 type ExchangeRateListProps = {
   selectedFrom: Currency['code'];
@@ -12,6 +13,7 @@ type ExchangeRateListProps = {
 };
 const rates = ref<Rate[]>([]);
 const loading = ref<boolean>(false);
+const errorText = ref<string>('');
 
 const popularCurrencies = [
   'EUR',
@@ -30,6 +32,7 @@ const props = defineProps<ExchangeRateListProps>();
 
 const fetchExchangeRates = async () => {
   loading.value = true;
+  errorText.value = '';
   const filteredCurrencies = popularCurrencies
     // 1. Filter excludes selectedTo and selectedFrom to avoid duplicaiton
     .filter(c => c !== props.selectedFrom && c !== props.selectedTo)
@@ -43,7 +46,11 @@ const fetchExchangeRates = async () => {
       return null;
     }
   });
-  rates.value = (await Promise.all(promises)).filter(el => el !== null);
+  const newRates = (await Promise.all(promises)).filter(el => el !== null);
+  if (newRates.length === 0) {
+    errorText.value = 'Error when fetching exchange rates list';
+  }
+  rates.value = newRates;
   loading.value = false;
 };
 
@@ -58,6 +65,7 @@ watch(
 </script>
 
 <template>
+  <ErrorText :text="errorText" />
   <div
     class="flex flex-col justify-center items-center w-full max-w-1280 mx-auto p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-lg font-semibold text-gray-800 text-center mb-4">
