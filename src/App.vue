@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
 import {type ConversionRate, type Currency} from './types';
 import {getAllCurrencies} from './api/currencies';
 import {getSingleCoversion} from './api/coversions';
@@ -17,10 +18,46 @@ const conversion = ref<ConversionRate | null>(null);
 const error = ref<string | null>(null);
 const triggerFetch = ref<boolean>(false);
 
+const route = useRoute();
+const router = useRouter();
+
+const updateQueryParams = () => {
+  const params: {
+    amount?: string;
+    base_currency?: CurrencyCode;
+    quote_currency?: CurrencyCode;
+  } = {};
+  if (amount.value) {
+    params.amount = amount.value;
+  }
+  if (selectedFrom.value) {
+    params.base_currency = selectedFrom.value;
+  }
+  if (selectedTo.value) {
+    params.quote_currency = selectedTo.value;
+  }
+  const url = new URL(window.location.href);
+  Object.keys(params).forEach(k => {
+    const key = k as keyof typeof params;
+    if (params[key]) {
+      url.searchParams.set(k, params[key]);
+    } else {
+      url.searchParams.delete(k);
+    }
+  });
+  window.history.pushState({}, '', url.toString());
+};
+
 const setAmount = (event: Event) => {
   const target = event.target as HTMLSelectElement;
   amount.value = target.value;
 };
+
+watch([amount, selectedFrom, selectedTo], () => {
+  if (router) {
+    updateQueryParams();
+  }
+});
 
 const convert = async () => {
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
@@ -46,6 +83,17 @@ onMounted(async () => {
   }
   currencies.value = data.map(el => el.code);
   selectedFrom.value = 'EUR'; // setting "from" value to 'EUR' as default and not changable due to SWOP account restrictions
+  if (route.query.amount) {
+    amount.value = route.query.amount.toString();
+  }
+  if (route.query.base_currency) {
+    selectedFrom.value = route.query.base_currency.toString();
+  }
+  if (route.query.quote_currency) {
+    selectedTo.value = route.query.quote_currency.toString();
+    triggerFetch.value = true;
+    await convert();
+  }
 });
 </script>
 
