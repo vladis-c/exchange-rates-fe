@@ -2,11 +2,11 @@
 import {defineProps} from 'vue';
 import type {ConversionRate} from '@/types';
 
-type SelectProps = {
+type RateTextProps = {
   conversion: ConversionRate;
 };
 
-defineProps<SelectProps>();
+defineProps<RateTextProps>();
 </script>
 
 <template>

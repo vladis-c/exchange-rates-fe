@@ -2,13 +2,14 @@
 import type {Currency} from '@/types';
 import {defineProps, defineEmits} from 'vue';
 
-type SelectProps = {
+type SelectCurrencyProps = {
   currencies: Currency['code'][];
   label: string;
+  disabled: boolean;
   modelValue: string;
 };
 
-defineProps<SelectProps>();
+defineProps<SelectCurrencyProps>();
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -22,6 +23,7 @@ const onChange = (event: Event) => {
   <div class="flex flex-col" v-if="modelValue !== undefined">
     <label :for="label" class="text-sm text-gray-600 mb-1">{{ label }}</label>
     <select
+      :disabled="disabled"
       :id="label"
       :value="modelValue"
       @change="onChange"

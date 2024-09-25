@@ -7,6 +7,7 @@ import {getSingleCoversion} from './api/coversions';
 import Select from './components/SelectCurrency.vue';
 import RateText from './components/RateText.vue';
 import ExchangeRatesList from './components/ExchangeRatesList.vue';
+import LoadingSpinner from './components/LoadingSpinner.vue';
 
 type CurrencyCode = Currency['code'];
 
@@ -17,6 +18,7 @@ const amount = ref<string | null>(null);
 const conversion = ref<ConversionRate | null>(null);
 const error = ref<string | null>(null);
 const triggerFetch = ref<boolean>(false);
+const loading = ref<boolean>(false);
 
 const route = useRoute();
 const router = useRouter();
@@ -60,6 +62,7 @@ watch([amount, selectedFrom, selectedTo], () => {
 });
 
 const convert = async () => {
+  loading.value = true;
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
     if (+amount.value === 0) {
       error.value = 'Invalid input: Please enter a valid number.';
@@ -74,11 +77,14 @@ const convert = async () => {
     );
     conversion.value = data;
   }
+  loading.value = false;
 };
 
 onMounted(async () => {
+  loading.value = true;
   const data = await getAllCurrencies();
   if (!data) {
+    loading.value = false;
     return;
   }
   currencies.value = data.map(el => el.code);
@@ -108,6 +114,7 @@ onMounted(async () => {
         <div class="flex flex-col">
           <label for="amount" class="text-sm text-gray-600 mb-1">Amount</label>
           <input
+            :disabled="loading"
             id="amount"
             type="number"
             class="p-4 border h-16 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -117,19 +124,28 @@ onMounted(async () => {
           <p v-if="error !== null">{{ error }}</p>
         </div>
         <!-- Select: currency to convert From -->
-        <Select label="From" :currencies="currencies" v-model="selectedFrom" />
+        <Select
+          label="From"
+          :currencies="currencies"
+          v-model="selectedFrom"
+          :disabled="loading" />
         <!-- Select: currency to convert To -->
-        <Select label="To" :currencies="currencies" v-model="selectedTo" />
+        <Select
+          label="To"
+          :currencies="currencies"
+          v-model="selectedTo"
+          :disabled="loading" />
         <!-- Button: Convert -->
         <button
-          class="p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
+          class="flex flex-row justify-center items-center p-4 h-16 bg-orange-900 text-white rounded-md hover:bg-orange-700 transition duration-200"
           @click="
             () => {
               triggerFetch = !triggerFetch;
               convert();
             }
           ">
-          Convert
+          <p v-if="!loading">Convert</p>
+          <LoadingSpinner :loading="loading" />
         </button>
         <!-- Display: Conversion rate -->
         <div v-if="conversion !== null">

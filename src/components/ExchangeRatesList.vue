@@ -2,14 +2,16 @@
 import {defineProps, ref, watch} from 'vue';
 import type {Currency, Rate} from '@/types';
 import {getExchangeRate} from '@/api/rates';
+import LoadingSpinner from './LoadingSpinner.vue';
 
-type SelectProps = {
+type ExchangeRateListProps = {
   selectedFrom: Currency['code'];
   selectedTo: Currency['code'];
   currencies: Currency['code'][];
   triggerFetch: boolean;
 };
 const rates = ref<Rate[]>([]);
+const loading = ref<boolean>(false);
 
 const popularCurrencies = [
   'EUR',
@@ -24,9 +26,10 @@ const popularCurrencies = [
   'SEK',
 ];
 
-const props = defineProps<SelectProps>();
+const props = defineProps<ExchangeRateListProps>();
 
 const fetchExchangeRates = async () => {
+  loading.value = true;
   const filteredCurrencies = popularCurrencies
     // 1. Filter excludes selectedTo and selectedFrom to avoid duplicaiton
     .filter(c => c !== props.selectedFrom && c !== props.selectedTo)
@@ -41,6 +44,7 @@ const fetchExchangeRates = async () => {
     }
   });
   rates.value = (await Promise.all(promises)).filter(el => el !== null);
+  loading.value = false;
 };
 
 watch(
@@ -55,12 +59,14 @@ watch(
 
 <template>
   <div
-    class="w-full max-w-1280 mx-auto p-6 bg-white shadow-md rounded-lg"
-    v-if="rates.length > 0">
+    class="flex flex-col justify-center items-center w-full max-w-1280 mx-auto p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-lg font-semibold text-gray-800 text-center mb-4">
       Exchange rates with most common currencies
     </h2>
-    <ul class="flex flex-col space-y-3">
+    <LoadingSpinner :loading="loading" />
+    <ul
+      class="flex flex-col space-y-3 w-full mt-4"
+      v-if="!loading && rates.length > 0">
       <li
         v-for="(rate, index) in rates"
         :key="index"
