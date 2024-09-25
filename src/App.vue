@@ -3,7 +3,7 @@ import {onMounted, ref} from 'vue';
 import {type ConversionRate, type Currency} from './types';
 import {getAllCurrencies} from './api/currencies';
 import {getSingleCoversion} from './api/coversions';
-import Select from './components/SelectComponent.vue';
+import Select from './components/SelectCurrency.vue';
 
 type CurrencyCode = Currency['code'];
 
