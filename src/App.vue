@@ -61,12 +61,24 @@ watch([amount, selectedFrom, selectedTo], () => {
   }
 });
 
+watch([amount], () => {
+  if (inputError.value !== null) {
+    inputError.value = null;
+  }
+});
+
 const convert = async () => {
+  if (amount.value === null) {
+    inputError.value = 'Invalid input: Please enter a valid number.';
+    return;
+  }
+  triggerFetch.value = !triggerFetch.value;
   loadingConversion.value = true;
   errorConversion.value = '';
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
     if (+amount.value === 0) {
       inputError.value = 'Invalid input: Please enter a valid number.';
+      loadingConversion.value = false;
       return;
     } else {
       inputError.value = null;
@@ -142,11 +154,17 @@ onMounted(async () => {
           :loading="loadingCurrencies" />
         <!-- Button: Convert -->
         <button
-          :disabled="currencies.length === 0"
+          :disabled="
+            amount === null ||
+            loadingConversion ||
+            loadingCurrencies ||
+            !selectedFrom ||
+            !selectedTo ||
+            currencies.length === 0
+          "
           class="flex flex-row justify-center items-center p-4 h-16 bg-orange-900 text-white rounded-md disabled:bg-gray-200 hover:bg-orange-700 transition duration-200"
           @click="
             () => {
-              triggerFetch = !triggerFetch;
               convert();
             }
           ">
