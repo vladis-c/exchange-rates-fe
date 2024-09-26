@@ -11,6 +11,10 @@ import LoadingSpinner from './components/LoadingSpinner.vue';
 import ErrorText from './components/ErrorText.vue';
 import InputAmount from './components/InputAmount.vue';
 
+const errorText1 = 'Invalid input: Please enter a valid number.';
+const errorText2 = 'Error when getting the conversion rate';
+const errorText3 = 'Error when fetching the list of currencies';
+
 type CurrencyCode = Currency['code'];
 
 const currencies = ref<CurrencyCode[]>([]);
@@ -69,7 +73,7 @@ watch([amount], () => {
 
 const convert = async () => {
   if (amount.value === null) {
-    inputError.value = 'Invalid input: Please enter a valid number.';
+    inputError.value = errorText1;
     return;
   }
   triggerFetch.value = !triggerFetch.value;
@@ -77,7 +81,7 @@ const convert = async () => {
   errorConversion.value = '';
   if (selectedFrom.value && selectedTo.value && amount.value !== null) {
     if (+amount.value === 0) {
-      inputError.value = 'Invalid input: Please enter a valid number.';
+      inputError.value = errorText1;
       loadingConversion.value = false;
       return;
     } else {
@@ -89,7 +93,7 @@ const convert = async () => {
       +amount.value,
     );
     if (data === null) {
-      errorConversion.value = 'Error when getting the conversion rate';
+      errorConversion.value = errorText2;
     }
     conversion.value = data;
   }
@@ -101,7 +105,7 @@ onMounted(async () => {
   const data = await getAllCurrencies();
   if (!data) {
     loadingCurrencies.value = false;
-    errorCurrencies.value = 'Error when fetching the list of currencies';
+    errorCurrencies.value = errorText3;
     return;
   }
   currencies.value = data.map(el => el.code);
