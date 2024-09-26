@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type {ConversionRate} from '@/types';
+import type {Rate} from '@/types';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -8,7 +8,7 @@ export const getExchangeRate = async (
   quote_currency: string,
 ) => {
   try {
-    const {data} = await axios.get<ConversionRate>(
+    const {data} = await axios.get<Rate>(
       `${BASE_URL}/rates/${base_currency}/${quote_currency}`,
     );
     return data;
