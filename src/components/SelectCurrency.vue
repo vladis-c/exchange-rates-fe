@@ -35,7 +35,7 @@ const onChange = (event: Event) => {
       :id="label"
       :value="modelValue"
       @change="onChange"
-      class="w-full p-4 h-16 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      class="w-full p-4 h-16 border rounded-md focus:outline-none focus:ring-1 focus:ring-orange-900 bg-orange-50">
       <option value="">-----</option>
       <option
         v-for="(currency, index) in currencies"

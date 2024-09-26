@@ -9,6 +9,7 @@ import RateText from './components/RateText.vue';
 import ExchangeRatesList from './components/ExchangeRatesList.vue';
 import LoadingSpinner from './components/LoadingSpinner.vue';
 import ErrorText from './components/ErrorText.vue';
+import InputAmount from './components/InputAmount.vue';
 
 type CurrencyCode = Currency['code'];
 
@@ -52,11 +53,6 @@ const updateQueryParams = () => {
     }
   });
   window.history.pushState({}, '', url.toString());
-};
-
-const setAmount = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
-  amount.value = target.value;
 };
 
 watch([amount, selectedFrom, selectedTo], () => {
@@ -123,20 +119,13 @@ onMounted(async () => {
       </h1>
       <div class="flex flex-col space-y-4">
         <!-- Input: Amount -->
-        <div class="flex flex-col">
-          <label for="amount" class="text-sm text-gray-600 mb-1">Amount</label>
-          <input
-            :disabled="
-              loadingConversion || loadingCurrencies || currencies.length === 0
-            "
-            id="amount"
-            type="number"
-            class="p-4 border h-16 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            placeholder="Amount"
-            @change="setAmount"
-            v-model="amount" />
-          <p v-if="inputError !== null">{{ inputError }}</p>
-        </div>
+        <InputAmount
+          :disabled="
+            loadingConversion || loadingCurrencies || currencies.length === 0
+          "
+          v-model="amount"
+          :error="inputError"
+          :label="'Amount'" />
         <!-- Select: currency to convert From -->
         <Select
           label="From"
