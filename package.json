@@ -1,5 +1,8 @@
 {
-  "name": "exchange-rates",
+  "name": "exchange-rates-fe",
+  "description": "Vuejs Typescript web app for exchange rates",
+  "author": "Vladislav Cherkasheninov",
+  "license": "MIT",
   "version": "1.0.0",
   "private": true,
   "type": "module",
