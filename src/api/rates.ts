@@ -1,13 +1,15 @@
 import axios from 'axios';
 import type {ConversionRate} from '@/types';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export const getExchangeRate = async (
   base_currency: string,
   quote_currency: string,
 ) => {
   try {
     const {data} = await axios.get<ConversionRate>(
-      `http://localhost:8000/rates/${base_currency}/${quote_currency}`,
+      `${BASE_URL}/rates/${base_currency}/${quote_currency}`,
     );
     return data;
   } catch (error) {
