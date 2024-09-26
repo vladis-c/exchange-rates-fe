@@ -1,39 +1,80 @@
-# exchange-rates-fe
+# Exchange rates app
 
-This template should help get you started developing with Vue 3 in Vite.
+A currency converter and exchange rates app.
 
-## Recommended IDE Setup
+- Convert one currency to another with a desired amount
+- See exchage rates of pupular currencies against your selected currency to convert from
+- Get the link of the exchange currencies pair from your friend and access the most recent information. Example query: `?amount=100&base_currency=EUR&quote_currency=AED` will convert 100 Euros to United Arab Emirates Dirham
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+This is a one page web-app that can be run with any PC, Mac or mobile device browser. The website is using `VueJS 3` framework, `typescript` language and `tailwind` styles.
 
-## Type Support for `.vue` Imports in TS
+## Backend
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+You will need to run backend app locally to make the web app work.
+Visit [https://github.com/vladis-c/exchange-rates-be](https://github.com/vladis-c/exchange-rates-be) to check the instructions on how to set it up on your machine
 
-## Customize configuration
+## Run the app
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+0. Add `.env` file:
 
-## Project Setup
+- Add `VITE_BASE_URL` variable with the base url \(localhost and server) where the app is going to be run. For example:
 
-```sh
-npm install
+```
+VITE_BASE_URL='http://localhost:8000'
 ```
 
-### Compile and Hot-Reload for Development
+1. Clone the repository:
 
-```sh
-npm run dev
+```bash
+git clone https://github.com/vladis-c/exchange-rates-fe.git
 ```
 
-### Type-Check, Compile and Minify for Production
+2. Navigate to the project folder:
 
-```sh
-npm run build
+```bash
+cd exchange-rates-fe
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+3. Install dependenciesL
 
-```sh
-npm run lint
+- Install `yarn` if you do not have it on your machine:
+
+```bash
+npm i -g yarn
+```
+
+- Then install the dependencies:
+
+```bash
+yarn
+```
+
+4. Run server:
+
+```bash
+yarn dev
+```
+
+- The server will be running on [http://localhost:3000](http://localhost:3000), which you can open in your browser
+
+## Tests
+
+App is tested against mock endpoints that are featured in the real app. Endpoints like `/currencies`, `/rates` and `/conversions`. They can be found in `__tests__` folder in the root of the app.
+
+0. Make sure all dependencies are installed:
+
+```bash
+yarn
+```
+
+1. Run tests:
+
+```bash
+yarn test
+```
+
+2. Run individual tests:
+
+```bash
+npx vitest -t <NAME_OF_THE_TEST>
 ```

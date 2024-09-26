@@ -46,7 +46,7 @@ const fetchExchangeRates = async () => {
       return null;
     }
   });
-  const newRates = (await Promise.all(promises)).filter(el => el !== null);
+  const newRates = (await Promise.all(promises)).filter(Boolean) as Rate[];
   if (newRates.length === 0) {
     errorText.value = 'Error when fetching exchange rates list';
   }
