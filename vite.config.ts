@@ -1,21 +1,20 @@
-import { fileURLToPath, URL } from 'node:url'
+import {fileURLToPath, URL} from 'node:url';
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
+import {defineConfig} from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vueJsx from '@vitejs/plugin-vue-jsx';
+import dotenv from 'dotenv';
 
-// https://vitejs.dev/config/
+dotenv.config();
+
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-  ],
-  server:{
+  plugins: [vue(), vueJsx()],
+  server: {
     port: 3000,
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
-})
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+});

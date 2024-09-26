@@ -16,7 +16,7 @@ defineProps<RateTextProps>();
     <div class="flex flex-col">
       <p class="text-xl">
         {{
-          `${getCurrencyText(conversion.base_currency, conversion.base_amount)}=`
+          `${getCurrencyText(conversion.base_currency, conversion.base_amount)} =`
         }}
       </p>
       <p class="text-4xl font-bold mb-4">
