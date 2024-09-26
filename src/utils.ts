@@ -7,5 +7,7 @@ export const getCurrencyText = (
     style: 'currency',
     currency,
     maximumSignificantDigits: digits,
-  }).format(amount);
+  })
+    .format(amount)
+    .replace(/[\u202F\u00A0]/, ' ');
 };
